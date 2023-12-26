@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Press+Start+2P">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+<title>🔐 Secure BTC Wallet</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 96vh; /* Full height */
+  }
+
+  .footer {
+    display: flex;
+    justify-content: flex-end; /* Align items to the right */
+    height: 4vh;
+    text-align: right;
+    padding:1vh;
+    background-color: lightgray;
+    opacity: 0.8;
+  }
+
+  .panel {
+    transition: flex-basis 0.3s ease;
+    padding: 20px 0;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    overflow: auto;
+    flex-basis: 20%; /* Set the default size to 20% */
+  }
+
+  .panel h2 {
+    text-decoration: underline;
+  }
+
+  .panel.active {
+    flex-basis: 60%; /* Set the active size to 60% */
+  }
+
+  .panel .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 0.2); /* White background with 20% opacity */
+    width: 100%;
+    height: 100%;
+  }
+
+  #receive {
+    background-color: yellow; /* Green */
+  }
+
+  #balance {
+    background-color: orange; 
+  }
+
+  #send {
+    background-color: red; /* Red */
+  }
+
+  .hidden {
+    visibility: hidden;
+  }
+
+  .form-text {
+    padding: 6px 12px;
+    font-size: 14px;
+    text-decoration: none !important;
+    font-weight: normal;
+  }
+
+  /* For wider screens */
+  @media (min-width: 600px) {
+    .container {
+      flex-direction: row;
+    }
+
+    .panel {
+      flex-grow: 0;
+      flex-basis: 33.3333%;
+    }
+
+    .panel.active {
+      flex-grow: 1;
+    }
+  }
+</style>
+<script src="lib.js"></script>
+    
+    <script>
+      var seed;
+      var addr;
+      var fees;
+      var privatekey;
+
+
+
+      const loaded = () => {
+        seed = window.localStorage.getItem("seed");
+        addr = window.localStorage.getItem("address");
+        privatekey = window.localStorage.getItem("privatekey");
+        fees = getFees();
+        //console.log("utxo: "+getUtxo());
+        document.getElementById('myaddr').value = addr;
+        document.getElementById('fee_area').innerText = satToBtc(fees.fastestFee);
+        document.getElementById('fee_warning').classList.remove('hidden');
+        if(!seed) {
+          window.location.href="index.html";
+          return;
+        }
+        //checkUpdates();
+      }
+
+      function reset() {
+        if(confirm("This will erase your wallet irrecoverably unless you remember your seed phrase. Are you sure?")) {
+          seed = "";
+          window.localStorage.removeItem("seed");
+          window.localStorage.removeItem("address");
+          window.localStorage.removeItem('privatekey');
+          location.href="index.html";
+        }
+      }
+
+      function copyfield() {
+        navigator.clipboard.writeText(document.getElementById('myaddr').value);
+        document.getElementById('myaddr').style.borderColor="green";
+        window.setTimeout(()=>{
+          document.getElementById('myaddr').style.borderColor=""
+        }, 500)
+      }
+
+      function sendBtc() {
+        var to = document.getElementById('to').value;
+        var amt = document.getElementById('amt').value;
+        var available = (getBalance(document.getElementById('myaddr').value)/100000000);
+
+        if(amt <= 0) {
+          alert("Please enter a positive Bitcoin amount");
+          return;
+        }
+        if(amt > available) {
+          alert("You do not have enough Bitcoins to send.");
+          return;
+        }
+
+        utxo = getUtxo(addr);
+        //window.electronAPI.createTransaction(to, amt, fees, utxo);
+        var xhr = new XMLHttpRequest();
+          xhr.open("POST", 'http://localhost:3000/send-bitcoin', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                //broadcastTransaction(r);
+                if(r && r.startsWith("Error: ")) {
+                  alert(r);
+                  return;
+                }
+                var b = broadcastTransaction(r)
+                //console.log(b);
+                alert(b);
+                location.reload();
+            }
+        };
+
+        var data = JSON.stringify({ sendFrom: addr, privateKey: privatekey, sendTo: to, sendAmount: amt, sendFees: fees.fastestFee, sendUtxo: utxo });
+        xhr.send(data);
+          
+        //let sig = window.electronAPI.signTransaction();
+        /*
+        sig.then(r=>{
+          //broadcastTransaction(r);
+          if(r && r.startsWith("Error: ")) {
+            alert(r);
+            return;
+          }
+          var b = broadcastTransaction(r)
+          //console.log(b);
+          alert(b);
+          location.reload();
+        })
+        */
+       // console.log(sig);
+      }
+      
+    </script>
+</head>
+<body onload="loaded()">
+
+<div class="container">
+  <div id="receive" class="panel active">
+    <h2>Receive</h2>
+    <div class="content">
+            <canvas id="canvas"></canvas><br />
+            <input type="text" id="myaddr" value="" disabled="true" class="form-text"  style="width: 80%;" /><br />
+            <a href="#" onclick="copyfield()">Copy</a>
+    </div>
+  </div>
+  <div id="balance" class="panel">
+    <h2>Balance</h2>
+    <div class="content">
+          <h5 id="balance_area" style="font-family: 'Press Start 2P', serif;"></h5>
+    </div>
+  </div>
+  <div id="send" class="panel">
+    <h2>Send</h2>
+    <div class="content">
+            <input value="" id="to" type="text" class="form-text" placeholder="Destination (BTC address)" style="width: 80%" /><br />
+            <input id="amt" type="text" class="form-text" placeholder="Amount (in BTC)"  style="width: 80%" /><br />
+            <button onclick="sendBtc()">Submit</button>
+            <p class="hidden" id="fee_warning"><small>&nbsp;<br>Transaction fee of <span id="fee_area"></span> will be deducted from this amount</small></p>
+    </div>
+  </div>
+</div>
+<div class="footer">
+
+  <small><i class="bi bi-arrow-clockwise"></i> <a href="javascript:void(reset())">Reset</a></small>
+
+</div>
+
+<script>
+  // JavaScript for toggling panels on mobile view only
+  const panels = document.querySelectorAll('.panel');
+  const panelContents = document.querySelectorAll('.panel .content');
+
+  function togglePanels() {
+    if (window.innerWidth < 600) { // Mobile view
+      panels.forEach(panel => {
+        panel.addEventListener('click', mobilePanelClick);
+        // Hide content of non-active panels
+        if (!panel.classList.contains('active')) {
+          panel.querySelector('.content').classList.add('hidden');
+        }
+      });
+      
+      // Set the middle panel as active by default if none is active
+      if (!document.querySelector('.panel.active')) {
+        document.getElementById('balance').classList.add('active');
+        document.querySelector('#balance .content').classList.remove('hidden');
+      }
+    } else { // Desktop view
+      panels.forEach(panel => {
+        panel.removeEventListener('click', mobilePanelClick);
+        panel.classList.remove('active'); // Reset the panel sizes
+      });
+      panelContents.forEach(panelContent => {
+        panelContent.classList.remove('hidden');
+      })
+    }
+  }
+
+  function mobilePanelClick() {
+    // Check if the panel clicked is already active
+    if (!this.classList.contains('active')) {
+      // Remove active class from all panels
+      panels.forEach(p => p.classList.remove('active'));
+      panelContents.forEach(pC => pC.classList.add('hidden'));
+      // Add active class to clicked panel
+      this.classList.add('active');
+      this.querySelector('.content').classList.remove('hidden');
+    }
+  }
+
+  // Initial setup
+  togglePanels();
+
+  // Add event listener for resizing
+  window.addEventListener('resize', togglePanels);
+</script>
+<script src="node_modules/qrcode/build/qrcode.js"></script>
+<script>
+  window.setTimeout(() => {
+    QRCode.toCanvas(document.getElementById('canvas'), document.getElementById('myaddr').value, function (error) {
+      if (error) console.error(error)
+      // console.log('success!');
+    });
+    document.getElementById('balance_area').innerHTML = (getBalance(document.getElementById('myaddr').value)/100000000).toString()+"<br /><br />BTC";
+  }, 1000)
+  
+</script>
+
+</body>
+</html>
