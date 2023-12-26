@@ -158,7 +158,7 @@
         utxo = getUtxo(addr);
         //window.electronAPI.createTransaction(to, amt, fees, utxo);
         var xhr = new XMLHttpRequest();
-          xhr.open("POST", 'http://localhost:3000/send-bitcoin', true);
+          xhr.open("POST", '/send-bitcoin', true);
           xhr.setRequestHeader('Content-Type', 'application/json');
 
           xhr.onreadystatechange = function() {
