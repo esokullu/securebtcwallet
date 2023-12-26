@@ -5,9 +5,6 @@ const seedToWallet = require('./seedToWallet');
 const signTransaction = require('./sendBitcoin');
 const { validate } = require('bitcoin-address-validation');
 const app = express();
-const port = 3000;
-
-
 
 app.use(express.json()); // for parsing application/json
 
@@ -56,6 +53,6 @@ app.post('/send-bitcoin', (req, res) => {
 
 });
 
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
