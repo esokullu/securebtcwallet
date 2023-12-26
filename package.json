@@ -5,6 +5,9 @@
   "icon": "build/icon.ico",
   "description": "A secure Bitcoin wallet",
   "license": "proprietary",
+  "scripts": {
+    "start": "node server.js"
+  },
   "keywords": [
     "bitcoin",
     "wallet",
