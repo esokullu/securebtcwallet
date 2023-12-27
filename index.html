@@ -40,9 +40,10 @@ footer {
     </style>
     <script src="bip39check.js"></script>
     <script src="seedgen.js"></script>
-    <script src="checkUpdates.js"></script>
+    <script src="bundle-seedToWallet.js"></script>
+
     <script>
-      
+      var exports = {};
       var seed;
       var addr;
       var m = new Mnemonic("english");
@@ -59,24 +60,12 @@ footer {
         if(document.getElementById('seedphrase').value != "") {
           seed = document.getElementById('seedphrase').value;
           window.localStorage.setItem("seed", seed);
-
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", '/generate-wallet', true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                var addr = response.address;
-                window.localStorage.setItem("address", addr);
-                var privateKey = response.key;
-                window.localStorage.setItem("privatekey", privateKey);
-                window.location.href = 'app.html';
-            }
-        };
-
-        var data = JSON.stringify({ mnemonic: seed });
-        xhr.send(data);
+          var response = seedToWallet(seed);
+          var addr = response.address;
+          window.localStorage.setItem("address", addr);
+          var privateKey = response.key;
+          window.localStorage.setItem("privatekey", privateKey);
+          window.location.href = 'app.html';
         }
   
       };
@@ -98,7 +87,7 @@ footer {
         else {
           window.location.href='app.html';
         }
-        checkUpdates();
+        //checkUpdates();
       }
 
       

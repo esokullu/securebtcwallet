@@ -11,6 +11,7 @@
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    overflow-y: hidden;
   }
 
   .container {
@@ -60,14 +61,17 @@
 
   #receive {
     background-color: yellow; /* Green */
+    overflow-y: hidden;
   }
 
   #balance {
     background-color: orange; 
+    overflow-y: hidden;
   }
 
   #send {
     background-color: red; /* Red */
+    overflow-y: hidden;
   }
 
   .hidden {
@@ -98,7 +102,7 @@
   }
 </style>
 <script src="lib.js"></script>
-    
+<script src="bundle-sendBitcoin.js"></script>
     <script>
       var seed;
       var addr;
@@ -157,14 +161,13 @@
 
         utxo = getUtxo(addr);
         //window.electronAPI.createTransaction(to, amt, fees, utxo);
-        var xhr = new XMLHttpRequest();
-          xhr.open("POST", '/send-bitcoin', true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
 
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                //broadcastTransaction(r);
-                if(r && r.startsWith("Error: ")) {
+        var r = signTransaction(
+           addr, privatekey, to, amt, fees.fastestFee, utxo 
+          // from, privKeyWIF, to, amount, feePerByte, utxos
+        );
+
+        if(r && r.startsWith("Error: ")) {
                   alert(r);
                   return;
                 }
@@ -172,27 +175,8 @@
                 //console.log(b);
                 alert(b);
                 location.reload();
-            }
-        };
 
-        var data = JSON.stringify({ sendFrom: addr, privateKey: privatekey, sendTo: to, sendAmount: amt, sendFees: fees.fastestFee, sendUtxo: utxo });
-        xhr.send(data);
           
-        //let sig = window.electronAPI.signTransaction();
-        /*
-        sig.then(r=>{
-          //broadcastTransaction(r);
-          if(r && r.startsWith("Error: ")) {
-            alert(r);
-            return;
-          }
-          var b = broadcastTransaction(r)
-          //console.log(b);
-          alert(b);
-          location.reload();
-        })
-        */
-       // console.log(sig);
       }
       
     </script>

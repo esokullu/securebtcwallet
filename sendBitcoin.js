@@ -57,4 +57,4 @@ function signTransaction (from, privKeyWIF, to, amount, feePerByte, utxos) {
         return msg;
 }
 
-module.exports = signTransaction;
+window.signTransaction = signTransaction;
