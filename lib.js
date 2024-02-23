@@ -50,8 +50,32 @@ function getUtxo(addr)
 }
 
 function satToBtc(amount) {
-    return amount/BITCOIN_SAT_MULT;
+    // Calculate the amount in BTC
+    let btcAmount = amount / BITCOIN_SAT_MULT;
+    
+    // Convert to string with a dynamic number of decimal places based on BITCOIN_DIGITS
+    // This ensures it won't shorten the number using scientific notation
+    return btcAmount.toFixed(BITCOIN_DIGITS);
 }
+
+function new_broadcastTransaction(transaction) {
+    console.log(transaction);
+    transaction = transaction.trim();
+    
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://insight.bitpay.com/api/tx/send", false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    
+    // Prepare the JSON payload with the signed transaction hex
+    var payload = JSON.stringify({
+        rawtx: transaction
+    });
+    
+    xhttp.send(payload);
+    
+    return xhttp.responseText;
+}
+
 
 function broadcastTransaction(transaction) {
     console.log(transaction);
