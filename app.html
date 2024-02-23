@@ -263,7 +263,7 @@
   // Add event listener for resizing
   window.addEventListener('resize', togglePanels);
 </script>
-<script src="node_modules/qrcode/build/qrcode.js"></script>
+<script src="qrcode.js"></script>
 <script>
   window.setTimeout(() => {
     QRCode.toCanvas(document.getElementById('canvas'), document.getElementById('myaddr').value, function (error) {
