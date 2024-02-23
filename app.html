@@ -118,7 +118,7 @@
         fees = getFees();
         //console.log("utxo: "+getUtxo());
         document.getElementById('myaddr').value = addr;
-        document.getElementById('fee_area').innerText = satToBtc(fees.fastestFee);
+        //document.getElementById('fee_area').innerText = satToBtc(fees.fastestFee);
         document.getElementById('fee_warning').classList.remove('hidden');
         if(!seed) {
           window.location.href="index.html";
@@ -203,7 +203,8 @@
             <input value="" id="to" type="text" class="form-text" placeholder="Destination (BTC address)" style="width: 80%" /><br />
             <input id="amt" type="text" class="form-text" placeholder="Amount (in BTC)"  style="width: 80%" /><br />
             <button onclick="sendBtc()">Submit</button>
-            <p class="hidden" id="fee_warning"><small>&nbsp;<br>Transaction fee of <span id="fee_area"></span> will be deducted from this amount</small></p>
+            <!--<p class="hidden" id="fee_warning"><small>&nbsp;<br>Transaction fee of <span id="fee_area"></span> will be deducted from this amount</small></p>-->
+            <p class="hidden" id="fee_warning"><small>&nbsp;<br>A small transaction fee will be deducted from this amount by the Bitcoin network</small></p>
     </div>
   </div>
 </div>
