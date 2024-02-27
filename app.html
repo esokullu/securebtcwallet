@@ -78,6 +78,11 @@
     visibility: hidden;
   }
 
+  .slim {
+    font-weight: 400;
+    padding: 0 10px
+  }
+
   .form-text {
     padding: 6px 12px;
     font-size: 14px;
@@ -195,6 +200,8 @@
     <h2>Balance</h2>
     <div class="content">
           <h5 id="balance_area" style="font-family: 'Press Start 2P', serif;"></h5>
+          <p><a href="https://fwd.cx/lTm7b8Kz22wg" Target="_blank"><img border="0" src="/build/coinmama.gif"  width="300" height="50"></a></p>
+          <p><small><a href="https://fwd.cx/lTm7b8Kz22wg" Target="_blank" class="slim">( how to purchase Bitcoin? )</a></small></p>
     </div>
   </div>
   <div id="send" class="panel">
@@ -204,7 +211,7 @@
             <input id="amt" type="text" class="form-text" placeholder="Amount (in BTC)"  style="width: 80%" /><br />
             <button onclick="sendBtc()">Submit</button>
             <!--<p class="hidden" id="fee_warning"><small>&nbsp;<br>Transaction fee of <span id="fee_area"></span> will be deducted from this amount</small></p>-->
-            <p class="hidden" id="fee_warning"><small>&nbsp;<br>A small transaction fee will be deducted from this amount by the Bitcoin network</small></p>
+            <p class="hidden slim" id="fee_warning"><small>&nbsp;<br>A small transaction fee will be deducted from this amount by the Bitcoin network</small></p>
     </div>
   </div>
 </div>
